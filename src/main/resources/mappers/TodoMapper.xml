@@ -39,4 +39,20 @@
 
 
 
+    <!--페이징 처리(원하는 글의 갯수 선택) 후 글 요청-->
+<select id="selectList" resultType="org.zerock.springex.domain.TodoVO">
+    select * from tbl_todo order by tno desc limit #{skip}, #{size}
+</select>
+
+    <!--글의 전체 갯수 구함-->
+
+
+
+
+<select id="getCount" resultType="int">
+    select count(*) from tbl_todo
+
+</select>
+
+
 </mapper>

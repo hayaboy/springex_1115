@@ -5,6 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zerock.springex.domain.TodoVO;
+import org.zerock.springex.dto.PageRequestDTO;
+import org.zerock.springex.dto.PageResponseDTO;
 import org.zerock.springex.dto.TodoDTO;
 import org.zerock.springex.mapper.TodoMapper;
 
@@ -32,14 +34,33 @@ public class TodoServiceImpl implements TodoService {
         todoMapper.insert(todoVO);
     }
 
-    //글 전체 조회
+    //글 전체 조회(페이징 처리 후)
     @Override
-    public List<TodoDTO> getAll() {
+    public PageResponseDTO<TodoDTO> getList(PageRequestDTO pageRequestDTO) {
 
-        List<TodoDTO> dtoList=todoMapper.selectAll().stream().map(vo->modelMapper.map(vo, TodoDTO.class)).collect(Collectors.toList());
+        List<TodoVO> voList= todoMapper.selectList(pageRequestDTO);
 
-        return dtoList;
+        List<TodoDTO> dtoList=voList.stream().map(vo -> modelMapper.map(vo,TodoDTO.class))
+                .collect(Collectors.toList());
+
+        int total=todoMapper.getCount(pageRequestDTO);
+
+
+        PageResponseDTO<TodoDTO> pageResponseDTO  = PageResponseDTO.<TodoDTO>withAll()
+                .dtoList(dtoList).total(total)
+                .pageRequestDTO(pageRequestDTO).build();
+
+        return pageResponseDTO;
     }
+
+    //글 전체 조회(페이징 처리 전)
+//    @Override
+//    public List<TodoDTO> getAll() {
+//
+//        List<TodoDTO> dtoList=todoMapper.selectAll().stream().map(vo->modelMapper.map(vo, TodoDTO.class)).collect(Collectors.toList());
+//
+//        return dtoList;
+//    }
 
     @Override
     public TodoDTO getOne(Long tno) {
